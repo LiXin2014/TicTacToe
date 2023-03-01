@@ -1,0 +1,65 @@
+body {
+    margin: 0;
+    padding: 0;
+    color: #333333;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
+.board {
+    margin: 50px auto;
+    width: fit-content;
+   /* font-size: 0px; */ /*This is to remove spaces between buttons in a row  https://stackoverflow.com/questions/53939955/remove-space-between-two-rows-of-small-buttons-in-a-table*/
+}
+
+.row {
+    display: flex;
+}
+
+.status {
+    margin: 0 auto;
+    width: fit-content;
+    font-size: large;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#id {
+    width: fit-content;
+}
+
+button {
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+    background: none;
+    font-size: xx-large;
+}
+
+button[data-columns="0"] {
+    border-right: 2px solid #333333;
+}
+
+button[data-columns="1"] {
+    border-right: 2px solid #333333;
+}
+
+button[data-rows="0"] {
+    border-bottom: 2px solid #333333;
+}
+
+button[data-rows="1"] {
+    border-bottom: 2px solid #333333;
+}
+
+#reset {
+    width: fit-content;
+    height: 30px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: solid 1px;
+}
+
+/*Learnt about vertical-align when aligning buttons: https://stackoverflow.com/questions/75586785/html-button-moves-aftter-being-clicked-on/75587738#75587738*/
+
