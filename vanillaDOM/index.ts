@@ -39,37 +39,63 @@ function onClick(event: MouseEvent) {
     current = current === "X" ? "O" : "X";
 }
 
-function checkWinLose(): Winner | undefined {
-    //check rows
-    if (gameBoard[0][0]?.innerText === gameBoard[0][1]?.innerText && gameBoard[0][0]?.innerText === gameBoard[0][2]?.innerText) {
-        return gameBoard[0][0]?.innerText as Winner;
-    }
-    if (gameBoard[1][0]?.innerText === gameBoard[1][1]?.innerText && gameBoard[1][0]?.innerText === gameBoard[1][2]?.innerText) {
-        return gameBoard[1][0]?.innerText as Winner;
-    }
-    if (gameBoard[2][0]?.innerText === gameBoard[2][1]?.innerText && gameBoard[2][0]?.innerText === gameBoard[2][2]?.innerText) {
-        return gameBoard[2][0]?.innerText as Winner;
-    }
-    //check columns
-    if (gameBoard[0][0]?.innerText === gameBoard[1][0]?.innerText && gameBoard[0][0]?.innerText === gameBoard[2][0]?.innerText) {
-        return gameBoard[0][0]?.innerText as Winner;
-    }
-    if (gameBoard[0][1]?.innerText === gameBoard[1][1]?.innerText && gameBoard[0][1]?.innerText === gameBoard[2][1]?.innerText) {
-        return gameBoard[0][1]?.innerText as Winner;
-    }
-    if (gameBoard[0][2]?.innerText === gameBoard[1][2]?.innerText && gameBoard[0][2]?.innerText === gameBoard[2][2]?.innerText) {
-        return gameBoard[0][2]?.innerText as Winner;
-    }
-    //check diagnols
-    if (gameBoard[0][0]?.innerText === gameBoard[1][1]?.innerText && gameBoard[0][0]?.innerText === gameBoard[2][2]?.innerText) {
-        return gameBoard[0][0]?.innerText as Winner;
-    }
-    if (gameBoard[0][2]?.innerText === gameBoard[1][1]?.innerText && gameBoard[0][2]?.innerText === gameBoard[2][0]?.innerText) {
-        return gameBoard[0][2]?.innerText as Winner;
-    }
+type Coordinate = [number, number];
+type Victory = [Coordinate, Coordinate, Coordinate];
+const victories: Victory[] = [
+  [
+    [0, 0],
+    [0, 1],
+    [0, 2],
+  ],
+  [
+    [1, 0],
+    [1, 1],
+    [1, 2],
+  ],
+  [
+    [2, 0],
+    [2, 1],
+    [2, 2],
+  ],
+  [
+    [0, 0],
+    [1, 0],
+    [2, 0],
+  ],
+  [
+    [0, 1],
+    [1, 1],
+    [2, 1],
+  ],
+  [
+    [0, 2],
+    [1, 2],
+    [2, 2],
+  ],
+  [
+    [0, 0],
+    [1, 1],
+    [2, 2],
+  ],
+  [
+    [0, 2],
+    [1, 1],
+    [2, 0],
+  ],
+];
 
+function checkWinLose(): Winner | undefined {
     if (movesMade === 9) {
         return "Tie";
+    }
+
+    for(let victory of victories) {
+        const cell1 = gameBoard[victory[0][0]][victory[0][1]];
+        const cell2 = gameBoard[victory[1][0]][victory[1][1]];
+        const cell3 = gameBoard[victory[2][0]][victory[2][1]];
+        if(cell1 && cell2 && cell3 && cell1.innerText === cell2.innerText && cell1.innerText === cell3.innerText) {
+            return cell1.innerText as Winner;
+        }
     }
 }
 
