@@ -3,24 +3,25 @@ const gameStatus = document.querySelector(".status");
 const ROW_COUNT = 3;
 const COL_COUNT = 3;
 
-type CellContent = HTMLButtonElement | undefined;
+type CellContent = "X" | "O" | "";
 
 type GameBoard = [[CellContent, CellContent, CellContent],
     [CellContent, CellContent, CellContent],
     [CellContent, CellContent, CellContent]]
 
 type CurrentMove = "X" | "O";
-type Winner = "X" | "O" | "Tie" | undefined;
+type Winner = "X" | "O" | "Tie" | "";
 
-let gameBoard: GameBoard = [[undefined, undefined, undefined],
-[undefined, undefined, undefined],
-[undefined, undefined, undefined]]
+let gameBoard: GameBoard = [["", "", ""],
+                            ["", "", ""],
+                            ["", "", ""]]
+
 let current: CurrentMove;
 let movesMade: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 = 0;
 let gameOver = false;
 let winner: Winner;
 
-function onClick(event: MouseEvent) {
+function onClick(event: MouseEvent, row: number, col: number) {
     if (event.target) {
         const button = event.target as HTMLButtonElement;
         if (button.innerText !== "" || gameOver) {
@@ -30,9 +31,10 @@ function onClick(event: MouseEvent) {
         movesMade++;
     }
 
+    gameBoard[row][col] = current;
     winner = checkWinLose();
 
-    if (winner) {
+    if (winner !== "") {
         gameOver = true;
     }
     updateStatus();
@@ -84,7 +86,7 @@ const victories: Victory[] = [
   ],
 ];
 
-function checkWinLose(): Winner | undefined {
+function checkWinLose(): Winner {
     if (movesMade === 9) {
         return "Tie";
     }
@@ -93,10 +95,12 @@ function checkWinLose(): Winner | undefined {
         const cell1 = gameBoard[victory[0][0]][victory[0][1]];
         const cell2 = gameBoard[victory[1][0]][victory[1][1]];
         const cell3 = gameBoard[victory[2][0]][victory[2][1]];
-        if(cell1 && cell2 && cell3 && cell1.innerText === cell2.innerText && cell1.innerText === cell3.innerText) {
-            return cell1.innerText as Winner;
+        if(cell1 !== "" && cell1 === cell2 && cell1 === cell3) {
+            return cell1;
         }
     }
+
+    return "";
 }
 
 function createButtons() {
@@ -108,8 +112,7 @@ function createButtons() {
             const button = document.createElement("button");
             button.setAttribute("data-rows", row.toString());
             button.setAttribute("data-columns", col.toString());
-            button.addEventListener("click", onClick);
-            gameBoard[row][col] = button;
+            button.addEventListener("click", (event) => onClick(event, row, col));
             rows.appendChild(button);
         }
 
@@ -157,6 +160,9 @@ function createGame() {
 
 function init() {
     createGame();
+    gameBoard = [["", "", ""],
+                 ["", "", ""],
+                 ["", "", ""]]
     current = "X";
     movesMade = 0;
     gameOver = false;
