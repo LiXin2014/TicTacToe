@@ -35,6 +35,7 @@ button {
     cursor: pointer;
     background: none;
     font-size: xx-large;
+    border: none;
 }
 
 button[data-columns="0"] {
