@@ -1,0 +1,50 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Space Mono', monospace;
+    color: #333;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.board {
+    margin: 0px auto;
+    width: fit-content;
+    padding-top: 50px;
+    font-size: x-large;
+}
+
+.board button {
+    background: none;
+    width: 100px;
+    height: 100px;
+    border: none;
+    font-size: inherit;
+}
+
+.board .row {
+    display: flex;
+}
+
+button[data-row="0"], button[data-row="1"] {
+    border-bottom: 2px #333 solid;
+}
+
+button[data-column="0"], button[data-column="1"] {
+    border-right: 2px #333 solid;
+}
+
+.status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+}
+
+.status-text {
+    font-size: x-large;
+    margin-bottom: 20px;
+}
