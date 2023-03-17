@@ -1,7 +1,9 @@
-import React from "react";
+import React from 'react';
+import { ReactElement } from 'react';
 import './index.css';
+import type { GameBoard, OnCellClick } from './utils';
 
-export function Board({onClick, board}) {
+export function Board({onClick, board}: {onClick: OnCellClick, board: GameBoard}): ReactElement {
     return (
         <div className="board">
             <div className="row">

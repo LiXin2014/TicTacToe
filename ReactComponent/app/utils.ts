@@ -11,3 +11,11 @@ export const WinCoordinates = [
     [[0, 0], [1, 1], [2, 2]],
     [[0, 2], [1, 1], [2, 0]],
 ];
+
+export type CellContent = "X" | "O" | "";
+
+export type GameBoard = [[CellContent, CellContent, CellContent], 
+                        [CellContent, CellContent, CellContent], 
+                        [CellContent, CellContent, CellContent]];
+
+export type OnCellClick<T = Element> = (event: React.MouseEvent<T, MouseEvent>, row: number, col: number) => void;

@@ -1,12 +1,20 @@
-import React from "react";
+import React from "react";   // can't remove this line, why?
 import ReactDom from "react-dom/client";
-import { Board } from "./board.jsx";
+import { Board } from "./board";
 import './index.css';
-import { WinCoordinates } from "./utils.ts";
+import { GameBoard, WinCoordinates } from "./utils";
 
-class App extends React.Component {
-    constructor() {
-        super();
+interface GameState {
+    next: "X" | "O";
+    winner: "X" | "O" | "Tie" | "";
+    board: GameBoard;
+    status: string;
+    steps: number;
+}
+
+class App extends React.Component<{}, GameState> {
+    constructor(props: {}) {
+        super(props);
         this.state = {
             next: "X",
             winner: "",
@@ -30,11 +38,12 @@ class App extends React.Component {
         )
     }
 
-    onCellClick(event, row, col) {
+    onCellClick(event: React.MouseEvent, row: number, col: number) {
         if(this.state.board[row][col] || this.state.winner) {
             return;
         }
-        event.target.innerText = this.state.next;
+        const button =  event.target as HTMLElement
+        button.innerText = this.state.next;
         this.state.board[row][col] = this.state.next;
 
         const winner = this.checkWinner();
@@ -85,6 +94,6 @@ class App extends React.Component {
     }
 }
 
-const rootElement = document.getElementById('app');
+const rootElement = document.getElementById('app') as HTMLElement;
 const root = ReactDom.createRoot(rootElement);
 root.render(<App />);
