@@ -19,3 +19,4 @@ export type GameBoard = [[CellContent, CellContent, CellContent],
                         [CellContent, CellContent, CellContent]];
 
 export type OnCellClick<T = Element> = (event: React.MouseEvent<T, MouseEvent>, row: number, col: number) => void;
+export type OnTimeTravelClick<T = Element> = (event: React.MouseEvent<T, MouseEvent>, step: number) => void;

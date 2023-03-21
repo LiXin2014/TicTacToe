@@ -2,15 +2,23 @@ import React from "react";   // can't remove this line, why?
 import ReactDom from "react-dom/client";
 import { Board } from "./board";
 import './index.css';
+import { TimeTravel } from "./timeTravel";
 import { GameBoard, WinCoordinates } from "./utils";
 
-interface GameState {
+interface GameStep {
     next: "X" | "O";
     winner: "X" | "O" | "Tie" | "";
     board: GameBoard;
     status: string;
-    steps: number;
 }
+
+interface GameState extends GameStep {
+    history: GameStep[];
+    totalSteps: number;
+}
+
+const ROW_COUNT = 3;
+const COL_COUNT = 3;
 
 class App extends React.Component<{}, GameState> {
     constructor(props: {}) {
@@ -20,10 +28,15 @@ class App extends React.Component<{}, GameState> {
             winner: "",
             board: [["", "", ""], ["", "", ""], ["", "", ""]],
             status: "Next: X",
-            steps: 0
+            totalSteps: 0,
+            history: []
         }
+        this.addStateToHistory();
         this.onCellClick = this.onCellClick.bind(this);
         this.onReset = this.onReset.bind(this);
+        this.deepCloneBoard = this.deepCloneBoard.bind(this);
+        this.addStateToHistory = this.addStateToHistory.bind(this);
+        this.onTimeTravel = this.onTimeTravel.bind(this);
     }
 
     render() {
@@ -33,6 +46,7 @@ class App extends React.Component<{}, GameState> {
                 <div className="status">
                     <div className="status-text">{this.state.status}</div>
                     <button className="reset" onClick={this.onReset}>Reset</button>
+                    <TimeTravel totalSteps={this.state.totalSteps} onTimeTravelClick={this.onTimeTravel}/>
                 </div>
             </>
         )
@@ -49,22 +63,24 @@ class App extends React.Component<{}, GameState> {
         const winner = this.checkWinner();
         if(winner) {
             const status = winner !== "Tie" ? `Winner: ${winner}` : "It is a Tie!";
-            this.setState({
+            this.setState((prevState) => ({
                 status,
-                winner
-            });
+                winner,
+                totalSteps: prevState.totalSteps + 1
+            }), ()=>this.addStateToHistory());
             return;
         }
 
-        const next = this.state.next === "X" ? "O" : "X";
-       
-        this.setState((prevState) => (
-            {
+        
+        this.setState((prevState) => {
+            const next = this.state.next === "X" ? "O" : "X";
+
+            return {
                 next: next,
                 status: `Next: ${next}`,
-                steps: prevState.steps + 1
+                totalSteps: prevState.totalSteps + 1
             }
-        ))
+        }, ()=>this.addStateToHistory());  //https://medium.learnreact.com/setstate-takes-a-callback-1f71ad5d2296
     }
     
     checkWinner() {
@@ -76,7 +92,7 @@ class App extends React.Component<{}, GameState> {
             }
         }
 
-        if(this.state.steps === 8) {
+        if(this.state.totalSteps === 8) {
             return "Tie";
         }
 
@@ -89,8 +105,46 @@ class App extends React.Component<{}, GameState> {
             winner: "",
             board: [["", "", ""], ["", "", ""], ["", "", ""]],
             status: "Next: X",
-            steps: 0
-        })
+            totalSteps: 0,
+            history: []
+        }, () => this.addStateToHistory());
+    }
+
+    onTimeTravel(event: React.MouseEvent, step: number) {
+        console.log(`time travel on step ${step}`);
+        const gotoStep = this.state.history[step];
+        this.setState(
+            {
+                board: this.deepCloneBoard(gotoStep.board),
+                next: gotoStep.next,
+                winner: gotoStep.winner,
+                status: gotoStep.status,
+            }
+        )
+    }
+
+    // NOTE: this method has to be in setState callback to guarantee it is called after state being set.
+    addStateToHistory() {
+        const gameStep: GameStep = {
+            next: this.state.next,
+            winner: this.state.winner,
+            status: this.state.status,
+            board: this.deepCloneBoard(this.state.board)
+        }
+
+        this.state.history.push(gameStep);
+    }
+
+    deepCloneBoard(board: GameBoard): GameBoard {
+        const newBoard: GameBoard = [["", "", ""], ["", "", ""], ["", "", ""]];
+
+        for(let row=0; row<ROW_COUNT; row++) {
+            for(let col=0; col<COL_COUNT; col++) {
+                newBoard[row][col] = board[row][col];
+            }
+        }
+
+        return newBoard;
     }
 }
 
