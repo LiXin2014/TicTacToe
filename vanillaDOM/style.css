@@ -71,12 +71,10 @@ ul {
 
 .status li {
     border: 1px black solid;
-    padding: 3px;
-    margin-bottom: 5px;
+    padding: 2px 5px;
+    margin-bottom: 4px;
+    box-shadow: 2px 2px;
     cursor: pointer;
-    border-radius: 5px;
-    padding-left: 5px;
-    padding-right: 5px;
 }
 
 /*Learnt about vertical-align when aligning buttons: https://stackoverflow.com/questions/75586785/html-button-moves-aftter-being-clicked-on/75587738#75587738*/
