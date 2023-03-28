@@ -5,82 +5,90 @@ import './index.css';
 import { TimeTravel } from "./timeTravel";
 import { GameBoard, WinCoordinates } from "./utils";
 
-interface GameStep {
-    next: "X" | "O";
-    winner: "X" | "O" | "Tie" | "";
+interface GameState {
     board: GameBoard;
-    status: string;
-}
-
-interface GameState extends GameStep {
-    history: GameStep[];
-    totalSteps: number;
+    currentStep: number;
+    history: GameBoard[];
 }
 
 const ROW_COUNT = 3;
 const COL_COUNT = 3;
 
 class App extends React.Component<{}, GameState> {
+    xIsNext: boolean;
+    winner: "X" | "O" | "Tie" | "";
+    totalSteps: number;
+
     constructor(props: {}) {
         super(props);
         this.state = {
-            next: "X",
-            winner: "",
             board: [["", "", ""], ["", "", ""], ["", "", ""]],
-            status: "Next: X",
-            totalSteps: 0,
-            history: []
+            currentStep: 0,
+            history: [[["", "", ""], ["", "", ""], ["", "", ""]]]
         }
-        this.addStateToHistory();
+
+        this.xIsNext = true;
+        this.winner = "";
+        this.totalSteps = 0;
         this.onCellClick = this.onCellClick.bind(this);
         this.onReset = this.onReset.bind(this);
         this.deepCloneBoard = this.deepCloneBoard.bind(this);
-        this.addStateToHistory = this.addStateToHistory.bind(this);
         this.onTimeTravel = this.onTimeTravel.bind(this);
     }
 
     render() {
+        this.xIsNext = this.state.currentStep % 2 === 0 ? true : false;
+        this.totalSteps = this.state.history.length;
+
+        this.winner = this.checkWinner();
+        
+        let status;
+        if(this.winner === "Tie") {
+            status = "It is a Tie!";
+        } else if(this.winner === "") {
+            status = `Next: ${this.xIsNext ? "X" : "O"}`
+        } else {
+            status = `Winner: ${this.winner}`;
+        }
+
         return (
             <>
                 <Board onClick={this.onCellClick} board={this.state.board}/>
                 <div className="status">
-                    <div className="status-text">{this.state.status}</div>
+                    <div className="status-text">{status}</div>
                     <button className="reset" onClick={this.onReset}>Reset</button>
-                    <TimeTravel totalSteps={this.state.totalSteps} onTimeTravelClick={this.onTimeTravel}/>
+                    <TimeTravel totalSteps={this.totalSteps} onTimeTravelClick={this.onTimeTravel}/>
                 </div>
             </>
         )
     }
 
     onCellClick(event: React.MouseEvent, row: number, col: number) {
-        if(this.state.board[row][col] || this.state.winner) {
+        if(this.state.board[row][col] || this.winner) {
             return;
         }
-        const button =  event.target as HTMLElement
-        button.innerText = this.state.next;
-        this.state.board[row][col] = this.state.next;
+        
+        const button =  event.target as HTMLElement;
+        const currentMove = this.xIsNext ? "X" : "O";
+        button.innerText = currentMove;
+        this.state.board[row][col] = currentMove;
 
-        const winner = this.checkWinner();
-        if(winner) {
-            const status = winner !== "Tie" ? `Winner: ${winner}` : "It is a Tie!";
+        this.winner = this.checkWinner();
+        if(this.winner) {
             this.setState((prevState) => ({
-                status,
-                winner,
-                totalSteps: prevState.totalSteps + 1
-            }), ()=>this.addStateToHistory());
+                currentStep: prevState.currentStep + 1,
+                history: [...prevState.history.slice(), this.deepCloneBoard(prevState.board)]
+            }));
             return;
         }
 
         
         this.setState((prevState) => {
-            const next = this.state.next === "X" ? "O" : "X";
-
             return {
-                next: next,
-                status: `Next: ${next}`,
-                totalSteps: prevState.totalSteps + 1
+                currentStep: prevState.currentStep + 1,
+                history: [...prevState.history.slice(), this.deepCloneBoard(prevState.board)]
             }
-        }, ()=>this.addStateToHistory());  //https://medium.learnreact.com/setstate-takes-a-callback-1f71ad5d2296
+        });  //https://medium.learnreact.com/setstate-takes-a-callback-1f71ad5d2296
     }
     
     checkWinner() {
@@ -92,7 +100,7 @@ class App extends React.Component<{}, GameState> {
             }
         }
 
-        if(this.state.totalSteps === 8) {
+        if(this.totalSteps === 8) {
             return "Tie";
         }
 
@@ -100,14 +108,14 @@ class App extends React.Component<{}, GameState> {
     }
 
     onReset() {
+        this.xIsNext = true;
+        this.winner = "";
+        this.totalSteps = 0;
         this.setState({
-            next: "X",
-            winner: "",
             board: [["", "", ""], ["", "", ""], ["", "", ""]],
-            status: "Next: X",
-            totalSteps: 0,
-            history: []
-        }, () => this.addStateToHistory());
+            currentStep: 0,
+            history: [[["", "", ""], ["", "", ""], ["", "", ""]]]
+        });
     }
 
     onTimeTravel(event: React.MouseEvent, step: number) {
@@ -115,24 +123,11 @@ class App extends React.Component<{}, GameState> {
         const gotoStep = this.state.history[step];
         this.setState(
             {
-                board: this.deepCloneBoard(gotoStep.board),
-                next: gotoStep.next,
-                winner: gotoStep.winner,
-                status: gotoStep.status,
+                currentStep: step,
+                board: this.deepCloneBoard(gotoStep),
             }
         )
-    }
-
-    // NOTE: this method has to be in setState callback to guarantee it is called after state being set.
-    addStateToHistory() {
-        const gameStep: GameStep = {
-            next: this.state.next,
-            winner: this.state.winner,
-            status: this.state.status,
-            board: this.deepCloneBoard(this.state.board)
-        }
-
-        this.state.history.push(gameStep);
+        this.winner = this.checkWinner();
     }
 
     deepCloneBoard(board: GameBoard): GameBoard {
