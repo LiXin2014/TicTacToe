@@ -1,20 +1,7 @@
 import React from "react";
 import { Cell } from "./cell.jsx";
 
-export function Board({isXNext, setIsXNext, array, checkWinner}) {
-    const handleClick = (e, index) => {
-        if(array[index] || checkWinner() !== "") {
-            return;
-        }
-
-        if(isXNext) {
-            array[index] = "X";
-        } else {
-            array[index] = "O";
-        }
-        setIsXNext(!isXNext);
-    }
-
+export function Board({array, handleClick}) {
     return (
         <div className="board">
             <div className="row">

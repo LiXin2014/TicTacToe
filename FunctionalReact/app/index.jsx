@@ -8,6 +8,21 @@ function Game() {
     const [array, setArray] = useState(new Array(9).fill(""));
     const winCoordinates = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
 
+    const handleClick = (e, index) => {
+        if(array[index] || checkWinner() !== "") {
+            return;
+        }
+
+        const arrayCopy = array.slice();
+        if(isXNext) {
+            arrayCopy[index] = "X";
+        } else {
+            arrayCopy[index] = "O";
+        }
+        setIsXNext(!isXNext);
+        setArray(arrayCopy);
+    }
+
     const checkWinner = () => {
         for (const indexes of winCoordinates) {
             if(array[indexes[0]] && array[indexes[0]] === array[indexes[1]] && array[indexes[1]] === array[indexes[2]]) {
@@ -41,7 +56,7 @@ function Game() {
 
     return (
         <>
-            <Board isXNext={isXNext} setIsXNext={setIsXNext} array={array} checkWinner={checkWinner}/>
+            <Board array={array} handleClick={handleClick}/>
             <div className="status">{status}</div>
             <button className="resetButton" onClick={handleReset}>Reset</button>
         </>
