@@ -36,6 +36,11 @@ body {
     background-color: #f5f3f3;
 }
 
+#app .board button:disabled {
+    background: none;
+    cursor: not-allowed;
+}
+
 #app button[data-row="0"], #app button[data-row="1"] {
     border-bottom: 2px #333 solid;
 }

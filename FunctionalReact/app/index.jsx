@@ -6,6 +6,7 @@ import { Board } from "./board.jsx";
 function Game() {
     const [isXNext, setIsXNext] = useState(true);
     const [array, setArray] = useState(new Array(9).fill(""));
+    let gameOver = false;
     const winCoordinates = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
 
     const handleClick = (e, index) => {
@@ -44,19 +45,22 @@ function Game() {
     if(winner === "") {
         status = `Next: ${isXNext ? "X" : "O"}`;
     } else if(winner === "Tie") {
+        gameOver = true;
         status = "It is a Tie!";
     } else {
+        gameOver = true;
         status = `Winner: ${winner}`;
     }
 
     const handleReset = () => {
         setIsXNext(true);
         setArray(new Array(9).fill(""));
+        gameOver = false;
     }
 
     return (
         <>
-            <Board array={array} handleClick={handleClick}/>
+            <Board array={array} handleClick={handleClick} gameOver={gameOver}/>
             <div className="status">{status}</div>
             <button className="resetButton" onClick={handleReset}>Reset</button>
         </>
