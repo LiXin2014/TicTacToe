@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import ReactDom from "react-dom/client";
 import './index.css';
 import { Board } from "./board.jsx";
+import { TimeTravel } from "./timeTravel.jsx";
 
 function Game() {
-    const [isXNext, setIsXNext] = useState(true);
-    const [array, setArray] = useState(new Array(9).fill(""));
+    const [currentMove, setCurrentMove] = useState(0);
+    const [history, setHistory] = useState([new Array(9).fill("")]);
+    let array = history[currentMove];
     let gameOver = false;
+    let isXNext = currentMove % 2 === 0;
     const winCoordinates = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
 
     const handleClick = (e, index) => {
@@ -20,8 +23,8 @@ function Game() {
         } else {
             arrayCopy[index] = "O";
         }
-        setIsXNext(!isXNext);
-        setArray(arrayCopy);
+        setHistory([...history.slice(0, currentMove+1), arrayCopy]);
+        setCurrentMove((prevMove) => prevMove+1);
     }
 
     const checkWinner = () => {
@@ -53,9 +56,13 @@ function Game() {
     }
 
     const handleReset = () => {
-        setIsXNext(true);
-        setArray(new Array(9).fill(""));
+        setCurrentMove(0);
+        setHistory([new Array(9).fill("")]);
         gameOver = false;
+    }
+
+    const handleChooseStep = (index) => {
+        setCurrentMove(index);
     }
 
     return (
@@ -63,6 +70,7 @@ function Game() {
             <Board array={array} handleClick={handleClick} gameOver={gameOver}/>
             <div className="status">{status}</div>
             <button className="resetButton" onClick={handleReset}>Reset</button>
+            <TimeTravel history={history} handleChooseStep={handleChooseStep}/>
         </>
     )
 }
