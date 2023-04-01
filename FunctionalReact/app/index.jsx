@@ -17,6 +17,7 @@ function Game() {
             return;
         }
 
+        // slice method is very useful in maintaining array immutability
         const arrayCopy = array.slice();
         if(isXNext) {
             arrayCopy[index] = "X";
